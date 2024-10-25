@@ -1,93 +1,149 @@
-# Dotnet Common
+# What is it?
 
+Various .NET Client libraries for utilization of APIs in [AdScore.com](https://adscore.com)
 
+##### Latest version: 1.1.0 - currently available features:
+1. SignatureVerifier
 
-## Getting started
+##### other languages:
+ * PHP: https://github.com/Adscore/client-libs-php
+ * JS: https://github.com/variably/adscore-node
+ * Java: https://github.com/Adscore/client-libs-java
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Installation
 
 ```
-cd existing_repo
-git remote add origin http://gitlab-web.iterative.pl/adscore/dotnet-common.git
-git branch -M master
-git push -uf origin master
+Install-Package AdScore.Signature -Version 1.1.0
 ```
 
-## Integrate with your tools
+Or by downloading .nuget file need from releases and provided from local "Packages Folder"
 
-- [ ] [Set up project integrations](http://gitlab-web.iterative.pl/adscore/dotnet-common/-/settings/integrations)
+https://docs.microsoft.com/pl-pl/nuget/consume-packages/install-use-packages-visual-studio#package-sources
 
-## Collaborate with your team
+https://docs.microsoft.com/pl-pl/nuget/reference/nuget-config-file
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Compatibility
 
-## Test and Deploy
+|AdScore SignatureVerifier Version                 |.NET Standard|
+|---------------------------------------------------|------|
+|[1.0.0](https://github.com/Adscore/client-libs-net/tree/1.0.0)|>= 1.6|
+|[1.0.1](https://github.com/Adscore/client-libs-net/tree/v1.0.1)|>= 1.6|
+|[1.0.2](https://github.com/Adscore/client-libs-net/tree/v1.0.2)|>= 1.6|
+|[1.1.0](https://github.com/Adscore/client-libs-net)|>= 1.6|
 
-Use the built-in continuous integration in GitLab.
+https://docs.microsoft.com/pl-pl/dotnet/standard/net-standard
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-***
+## Examples
 
-# Editing this README
+Below is quick example of how to use a verifier.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+To get the client-libs-net-sample project as submodule execute e.g.
+```
+git submodule init && git pull --recurse-submodules && git submodule update --remote
+```
+or clone it as a separate repository:
+```
+git clone https://github.com/Adscore/client-libs-net-samples 
+```
 
-## Suggestions for a good README
+Then check `submodules/client-libs-net-samples/readme.md`, there is info on how to execute sample.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Features documentation
 
-## Name
-Choose a self-explaining name for your project.
+### 1. SignatureVerifier
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+The definition of verify function looks as follows:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```csharp
+/// <summary>
+/// 
+/// </summary>
+/// <param name="signature">the string which we want to verify</param>
+/// <param name="userAgent">string with full description of user agent like 'Mozilla/5.0 (Linux; Android 9; SM-J530F)...'</param>
+/// <param name="signRole">string which specifies if we operate in customer or master role. For AdScore customers this should be always set to 'customer'</param>
+/// <param name="key">string containing related zone key</param>
+/// <param name="isKeyBase64Encoded">defining if passed key is base64 encoded or not</param>
+/// <param name="expiry">Unix timestamp which is time in seconds. IF signatureTime + expiry > CurrentDateInSeconds THEN result is expired</param>
+/// <param name="ipAddresses">array of strings containing ip4 or ip6 addresses against which we check signature</param>
+/// <returns></returns>
+public static SignatureVerificationResult Verify(
+    string signature,
+    string userAgent,
+    string signRole,
+    string key,
+    [bool isKeyBase64Encoded,] // optional due existence of overloaded function
+    [int? expiry,] // optional due existence of overloaded function
+    params string[] ipAddresses)
+{
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Following are few quick examples of how to use verifier, first import the entry point for library:
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+```csharp
+using AdScore.Signature;
+[..]
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+then you have at least few options of how to verify signatures:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```csharp
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+    // Verify with base64 encoded key and without expiry checking
+    SignatureVerificationResult result =
+        SignatureVerifier.Verify(
+            "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+            "customer",
+            "a2V5X25vbl9iYXNlNjRfZW5jb2RlZA==",
+            "73.109.57.137");
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+    [..]
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+    // Verify with base64 encoded key.
+    // (No expiry parameter, the default expiry time for requestTime and signatureTime is 60s)
+    result =
+        SignatureVerifier.Verify(
+            "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+            "customer",
+            "key_non_base64_encoded",
+            false, // notify that we use non encoded key
+            60, // signature cant be older than 1 min
+            "73.109.57.137");
+    [..]
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+    //(No expiry parameter, the default expiry time for requestTime and signatureTime is 60s)
+    result =
+        SignatureVerifier.Verify(
+            "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+            "customer",
+            "key_non_base64_encoded",
+            false, // notify that we use non encoded key
+            "73.109.57.137", "73.109.57.138", "73.109.57.139", "73.109.57.140", "0:0:0:0:0:ffff:4d73:55d3", "0:0:0:0:0:fffff:4d73:55d4", "0:0:0:0:0:fffff:4d73:55d5", "0:0:0:0:0:fffff:4d73:55d6");
+    [..]
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+    // Verify against number of ip4 and ip6 addresses passed as an array
+    String[] ipAddresses = {"73.109.57.137", "73.109.57.138", "73.109.57.139", "73.109.57.140", "0:0:0:0:0:ffff:4d73:55d3", "0:0:0:0:0:fffff:4d73:55d4", "0:0:0:0:0:fffff:4d73:55d5", "0:0:0:0:0:fffff:4d73:55d6"};
+    result =
+        SignatureVerifier.Verify(
+            "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+            "customer",
+            "a2V5X25vbl9iYXNlNjRfZW5jb2RlZA==",
+            360,  // signature cant be older than 5min
+            ipAddresses);
+    
+    
+    // result object will contain a non-null value in verdict field in case of success
+    // or a non-null value in error field in cases of failure
+    
+    if (result.Error != null) {
+      // Failed to verify signature, handle error i.e.
+      Logger.LogWarning("Failed to verify signature: " + result.Error);
+    } else {
+      Logger.LogInfo("Signature verification with verdict: " + result.Verdict + " for ip " + result.IpAddress);
+    }
+);
+```

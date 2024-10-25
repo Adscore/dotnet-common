@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>AdScore.Signature</PackageId>
+    <Version>1.1.0</Version>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>AdScore.Signature</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company>Adscore Technologies DMCC</Company>
+    <Authors>Adscore Technologies DMCC</Authors>
+    <Product>Adscore Client Libraries</Product>
+    <Description>Package containing libraries facilitating using of AdScore.com APIs</Description>
+    <RepositoryUrl>https://github.com/Adscore/client-libs-net</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IPNetwork2" Version="2.5.240" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
+    <PackageReference Include="MimeKit" Version="4.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Sodium.Core" Version="1.3.5" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
+
+</Project>
