@@ -1,97 +1,63 @@
-# What is it?
+# dotnet-common
 
-Various .NET Client libraries for utilization of APIs in [AdScore.com](https://adscore.com)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
-##### Latest version: 1.1.0 - currently available features:
-1. SignatureVerifier
+This library provides various utilities for parsing [Adscore](https://adscore.com) signatures v4 and v5,
+and virtually anything that might be useful for customers doing server-side
+integration with the service.
 
-##### other languages:
- * PHP: https://github.com/Adscore/client-libs-php
- * JS: https://github.com/variably/adscore-node
- * Java: https://github.com/Adscore/client-libs-java
+## Compatibility
 
-### Installation
+### Supported Signature v5 algorithms
+1. `v5_0200H - OpenSSL CBC, HTTP query`
+2. `v5_0200S - OpenSSL CBC, PHP serialize`
+3. `v5_0201H - OpenSSL GCM, HTTP query`
+4. `v5_0201S - OpenSSL GCM, PHP serialize`
+5. `v5_0101H - sodium secretbox, HTTP query`
+6. `v5_0101S - sodium secretbox, PHP serialize`
+7. `v5_0200J - OpenSSL CBC, JSON`
+8. `v5_0201J - OpenSSL GCM, JSON`
+9. `v5_0101J - sodium secretbox, JSON`
+10. `v5_0101M - sodium secretbox, msgpack`
+11. `v5_0200M - OpenSSL CBC, msgpack`
+12. `v5_0201M - OpenSSL GCM, msgpack`
 
+### Not supported Signature v5 algorithms
+
+1. `v5_0101I - sodium secretbox, igbinary`
+2. `v5_0200I - OpenSSL CBC, igbinary`
+3. `v5_0201I - OpenSSL GCM, igbinary`
+
+## Install
+
+.NET/.NET Core Framework compatible with .NET Standard 2.1 is required.
+
+The easiest way to utilize the library is to attach it as a NuGet dependency:
 ```
-Install-Package AdScore.Signature -Version 1.1.0
-```
-
-Or by downloading .nuget file need from releases and provided from local "Packages Folder"
-
-https://docs.microsoft.com/pl-pl/nuget/consume-packages/install-use-packages-visual-studio#package-sources
-
-https://docs.microsoft.com/pl-pl/nuget/reference/nuget-config-file
-
-### Compatibility
-
-|AdScore SignatureVerifier Version                 |.NET Standard|
-|---------------------------------------------------|------|
-|[1.0.0](https://github.com/Adscore/client-libs-net/tree/1.0.0)|>= 1.6|
-|[1.0.1](https://github.com/Adscore/client-libs-net/tree/v1.0.1)|>= 1.6|
-|[1.0.2](https://github.com/Adscore/client-libs-net/tree/v1.0.2)|>= 1.6|
-|[1.1.0](https://github.com/Adscore/client-libs-net)|>= 1.6|
-
-https://docs.microsoft.com/pl-pl/dotnet/standard/net-standard
-
-
-## Examples
-
-Below is quick example of how to use a verifier.
-
-To get the client-libs-net-sample project as submodule execute e.g.
-```
-git submodule init && git pull --recurse-submodules && git submodule update --remote
-```
-or clone it as a separate repository:
-```
-git clone https://github.com/Adscore/client-libs-net-samples 
+adscore.common
 ```
 
-Then check `submodules/client-libs-net-samples/readme.md`, there is info on how to execute sample.
+## Usage
 
-## Features documentation
+### V4 signature decryption
 
-### 1. SignatureVerifier
+When zone's "Response signature algorithm" is set to "Hashing" or "Signing", it means that V4 signatures are in use. They provide basic means to check incoming traffic for being organic and valuable, but do not carry any additional information.
 
-The definition of verify function looks as follows:
+Here are a few quick examples on how to use the verifier. First import the library namespace:
 
-```csharp
-/// <summary>
-/// 
-/// </summary>
-/// <param name="signature">the string which we want to verify</param>
-/// <param name="userAgent">string with full description of user agent like 'Mozilla/5.0 (Linux; Android 9; SM-J530F)...'</param>
-/// <param name="signRole">string which specifies if we operate in customer or master role. For AdScore customers this should be always set to 'customer'</param>
-/// <param name="key">string containing related zone key</param>
-/// <param name="isKeyBase64Encoded">defining if passed key is base64 encoded or not</param>
-/// <param name="expiry">Unix timestamp which is time in seconds. IF signatureTime + expiry > CurrentDateInSeconds THEN result is expired</param>
-/// <param name="ipAddresses">array of strings containing ip4 or ip6 addresses against which we check signature</param>
-/// <returns></returns>
-public static SignatureVerificationResult Verify(
-    string signature,
-    string userAgent,
-    string signRole,
-    string key,
-    [bool isKeyBase64Encoded,] // optional due existence of overloaded function
-    [int? expiry,] // optional due existence of overloaded function
-    params string[] ipAddresses)
-{
-```
-
-Following are few quick examples of how to use verifier, first import the entry point for library:
-
-```csharp
+```C#
 using AdScore.Signature;
-[..]
+[...]
 ```
 
-then you have at least few options of how to verify signatures:
+than you have several options of how to verify signatures:
 
-```csharp
+```C#
 
-    // Verify with base64 encoded key and without expiry checking
-    SignatureVerificationResult result =
-        SignatureVerifier.Verify(
+    // Verify with base64 encoded key.
+    // (No expiry parameter, the default expiry time for requestTime and signatureTime is 60s)
+    Signature4VerificationResult result =
+        Signature4Verifier.Verify(
             "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "customer",
@@ -100,34 +66,39 @@ then you have at least few options of how to verify signatures:
 
     [..]
 
-    // Verify with base64 encoded key.
-    // (No expiry parameter, the default expiry time for requestTime and signatureTime is 60s)
+    // Verify with checking if expired and non base64 encoded key
+    //
+    // IF signatureTime + expiry > CurrentDateInSeconds
+    // THEN result.IsExpired == true
     result =
-        SignatureVerifier.Verify(
+        Signature4Verifier.Verify(
             "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "customer",
             "key_non_base64_encoded",
             false, // notify that we use non encoded key
-            60, // signature cant be older than 1 min
+            60, // signature cant be older than 1 min 
             "73.109.57.137");
     [..]
 
+    // Verify against number of ip4 and ip6 addresses
     //(No expiry parameter, the default expiry time for requestTime and signatureTime is 60s)
     result =
-        SignatureVerifier.Verify(
+        Signature4Verifier.Verify(
             "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "customer",
             "key_non_base64_encoded",
             false, // notify that we use non encoded key
+                
+             //Multiple ip addresses either from httpXForwardForIpAddresses and remoteIpAddresses header
             "73.109.57.137", "73.109.57.138", "73.109.57.139", "73.109.57.140", "0:0:0:0:0:ffff:4d73:55d3", "0:0:0:0:0:fffff:4d73:55d4", "0:0:0:0:0:fffff:4d73:55d5", "0:0:0:0:0:fffff:4d73:55d6");
     [..]
 
     // Verify against number of ip4 and ip6 addresses passed as an array
     String[] ipAddresses = {"73.109.57.137", "73.109.57.138", "73.109.57.139", "73.109.57.140", "0:0:0:0:0:ffff:4d73:55d3", "0:0:0:0:0:fffff:4d73:55d4", "0:0:0:0:0:fffff:4d73:55d5", "0:0:0:0:0:fffff:4d73:55d6"};
     result =
-        SignatureVerifier.Verify(
+        Signature4Verifier.Verify(
             "BAYAXlNKGQFeU0oggAGBAcAAIAUdn1gbCBmA-u-kF--oUSuFw4B93piWC1Dn-D_1_6gywQAgEXCqgk2zPD6hWI1Y2rlrtV-21eIYBsms0odUEXNbRbA",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
             "customer",
@@ -137,13 +108,40 @@ then you have at least few options of how to verify signatures:
     
     
     // result object will contain a non-null value in verdict field in case of success
-    // or a non-null value in error field in cases of failure
-    
-    if (result.Error != null) {
-      // Failed to verify signature, handle error i.e.
-      Logger.LogWarning("Failed to verify signature: " + result.Error);
-    } else {
-      Logger.LogInfo("Signature verification with verdict: " + result.Verdict + " for ip " + result.IpAddress);
-    }
-);
 ```
+
+### V5 signature decryption
+
+V5 is in fact an encrypted payload containing various metadata about the traffic. Its decryption does not rely on IP address 
+nor User Agent string, so it is immune for environment changes usually preventing V4 to be even decoded. Judge result is also 
+included in the payload, but client doing the integration can make its own decision basing on the metadata accompanying.
+
+Zone has to be set explicitly to V5 signature, if you don't see the option, please contact support as we are rolling this 
+mode on customer's demand. The format supports a wide variety of encryption and serialization methods, some of them are included 
+in this repository, but it can be extended to fulfill specific needs.
+
+It can be integrated in V4-compatible mode, not making use of any V5 features (see V4 verification):
+
+
+```C#
+using AdScore.Signature;
+
+[...]
+
+    Signature5VerificationResult result = Signature5Verifier.Verify(
+        "BQO7AAAAAAAB8RABAQX93o4s4rKP_WfrdzFP6ATAWgpXwS8Y7oECAcpVJXb-rGN2aH0KbFw5zvhEpoyEml6vRM7ePFigDUhDProdHA8uw1L62k57fX8t_j0UCEI6_oKHTvfU_fbfg2CXf0v64oRHxaKkcD3BqjQoL3ow89dAWX4xOsWHyO77xvxeh78yE7GTKVm8NDNQNkWbaLvv__y8vW2PHamWkqJypw9q4KYZ00YuIkn5DW5SmW-m1InOOyKySX64QKawwfsNqDE-vZBzFhQXLNGRpOsu_NWadjKE97Lm_1BLJ0QXscJmI0N77TyrpEjclI6b4yLiG0W_dkOSrStk3WPzbUv_dbY2UDAOoZaFr5PsXGPSEprVk1FNRmSaxxnGqYm8hD9y3c-VBqnDGPZIGpP-JXLrJv1q-s-XJkXXDIJyz89rDnRf10gn0iEC-wsocx5QBQunD1PNnkB8_r5xVXxKG2kgxeApVH7Bdbs9zf35enjD8VP8tA8-kiDR96jhcY0eJzSqXrMsRfpVqyPsJeGcex2DXNALWo8f07ikfH4fZxiQ9dzUTsY9zG0fH7SiRl1QexsKM6ICeKVSbublStF-XnbqHAc7BeShJGBT1z5qF71i-vlut4xY7xNrgpiWX57ER8d3IPqJEqrktyAslNz-LKKLF2N5z03DZzpcqmv6E6e5PeI-eURYK871Xoc1vO03BUPjcyDH3Wge2qDg1u_38tP3p2V8deLYofk1hsfEyk6lLoCNd-293jOFqZ3quifwujueEmQ4NZwht9dtk5Ee-osYezvKT9UZyTjVQrGO6WWklhLTfi8a-ApL8M3_7fFX0MNL0JqQTrKtFJnrWpdH2eXOtAPBbmIfPGNXbei9R_kOY_v3FmHLVomRCCAbftVlwr8cxpdVn3CPu5lls9yR15_XpCFm8g4QZFQPM4sM4UCPlXQNiGo4M0DAFMIPFBsPYam-TAPTqKmPpCWDR9M-dHFMF5MdBkOmtAibElnRXuZxqBJO2nl8QO3zGI9TFqS7v_0d2r1ADCAjd9hWYJXcTkl1dWbo4Q-IFxKhof1d3TjjVf3wTyVzsiwbEJUV7FXg31qAyAZzSn6EqWhGAd6ocdQvsXS6KH6Q5FsTM6S5IJ4o4q9x7YN58css97WbFw5RffPNHNggU97sEqG4ZcPEwMo8yXNK6V03DJFgLBC2F7C16vzZNualajF92_wsJ5XgjzU7say5ucmDRtQA5IEisPz8jl9vuLL8quS-I-zsJA-MJh6QsowPoegk8Ur76kn0",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "dj0lTcsmjDnDYPSL2+DQPN7QwirCQOlqnPhiXwusEM0=",
+        ["176.103.168.60"]);
+    );
+```
+
+The result field score only after a successful Verify() call. This is expected behavior, to preserve compliance with V4 behavior - the result is only valid when it's proven to belong to a visitor; in other case an exception will be thrown. For custom integrations not relying on built-in verification routines (usually more tolerant), the result is present also in result field, but it's then the integrator's reponsibility to ensure whether it's trusted or not. When desired validation is more strict than the built-in one, the verify() can be called first, and after that any additional verification may take place. 
+
+Note: V4 signature parser also holds the payload, but it does not contain any useful informations, only timestamps and signed strings; especially - it does not contain any Judge result value, it is derived from the signature via several hashing/verification approaches.
+
+## Integration
+
+Any questions you have with custom integration, please contact our support@adscore.com. Please remember that we do
+require adequate technical knowledge in order to be able to help with the integration; there are other integration
+methods which do not require any, or require very little programming.

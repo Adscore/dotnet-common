@@ -133,7 +133,7 @@ namespace AdScore.Signature.Verification.V4
                                 {
                                     if (IsExpired(expiry, signatureTime, requestTime))
                                     {
-                                        validationResult.Expired = true;
+                                        validationResult.IsExpired = true;
                                         return validationResult;
                                     }
                                     isValid = true;

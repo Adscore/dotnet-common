@@ -25,8 +25,9 @@
 #endregion
 
 using System.Collections.Generic;
+using AdScore.Signature.Verification.V5;
 
-namespace AdScore.Signature.Verification.V5
+namespace AdScore.Signature
 {
     /**
      * Entry point of AdScore signature v5 verification library. It expose verify method allowing to verify

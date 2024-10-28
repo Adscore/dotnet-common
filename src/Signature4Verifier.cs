@@ -25,9 +25,10 @@
 #endregion
 
 using System.Runtime.CompilerServices;
+using AdScore.Signature.Verification.V4;
 
 [assembly: InternalsVisibleTo("AdscoreClientNetLibs.Signature.Tests")]
-namespace AdScore.Signature.Verification.V4
+namespace AdScore.Signature
 {
     public class Signature4Verifier
     {

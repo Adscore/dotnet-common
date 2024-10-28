@@ -33,7 +33,7 @@ namespace AdScore.Signature.Verification.V4
         public int? Score { get; set; }
         public int? RequestTime { get; set; }
         public int? SignatureTime { get; set; }
-        public bool? Expired { get; set; }
+        public bool? IsExpired { get; set; }
         public string Error { get; set; }
     }
 }
