@@ -47,12 +47,12 @@ namespace AdScore.Signature.Encryption
             int pos = methodSize;
             var decryptResult = new DecryptResult();
             var unpack = PhpUnpack.Unpack("vmethod", payload.SubBuffer(0, pos));
-            decryptResult.            Method = Convert.ToInt32(unpack["method"]);
+            decryptResult.Method = Convert.ToInt32(unpack["method"]);
 
             foreach (var entry in lengths)
             {
                 var bytesForKey = payload.SubBuffer(pos, entry.Value);
-                decryptResult.                ByteBufferMap[entry.Key] = bytesForKey;
+                decryptResult.ByteBufferMap[entry.Key] = bytesForKey;
                 pos += entry.Value;
             }
 

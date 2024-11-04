@@ -40,7 +40,7 @@ namespace AdScore.Signature.Verification.V5
                 (tupleKey: "zone_id", act: b => response.SetZoneId(b)),
                 (tupleKey: "data", act: b => response.Data = b),
                 (tupleKey: "b.tzoffset", act: b => response.SetTzOffset(b)),
-                (tupleKey: "HsignatureTime", act: b => response.SignatureTime = b),
+                (tupleKey: "signatureTime", act: b => response.SignatureTime = b),
                 (tupleKey: "b.sr.w", act: b => response.SetHorizontalResolution(b)),
                 (tupleKey: "result", act: b => response.SetResult(b)),
                 (tupleKey: "b.truech.model", act: b => response.TruechModel = b),

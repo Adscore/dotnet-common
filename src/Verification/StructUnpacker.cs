@@ -93,7 +93,7 @@ namespace AdScore.Signature.Verification
         {
             try
             {
-                string queryString = Encoding.UTF8.GetString(data.Array());
+                string queryString = Encoding.UTF8.GetString(data.SubBuffer(1).Array());
                 string decoded = decodeUrl(queryString);
                 string[] pairs = decoded.Split("&");
                 var result = new Dictionary<string, string>();
